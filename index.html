@@ -19,7 +19,7 @@
         const env = document.getElementById('env').value;
         const email = document.getElementById('email').value;
         
-        fetch(`https://${myob-id-account-bff-dev.svc.platform.myobdev.com}/v1/change-password`, {
+        fetch(`https://${env}/v1/change-password`, {
   "headers": {
     "cache-control": "no-cache",
     "content-type": "application/json",
