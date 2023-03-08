@@ -7,7 +7,8 @@
   <body>
     <form id="test-form">
       <label for="data">Enter data:</label>
-      <input type="text" id="data" name="data" required>
+      <input type="text" id="env" name="env" required placeholder="myob-id-account-bff-dev.svc.platform.myobdev.com">
+      <input type="text" id="email" name="email" required placeholder="kpsesuo+test1@gmail.com">
       <button type="submit" onclick="sendData(event)">Submit</button>
     </form>
     
@@ -15,14 +16,15 @@
       function sendData(event) {
         event.preventDefault();
         
-        const data = document.getElementById('data').value;
+        const env = document.getElementById('env').value;
+        const email = document.getElementById('email').value;
         
-        fetch("https://myob-id-account-bff-dev.svc.platform.myobdev.com/v1/change-password", {
+        fetch(`https://${myob-id-account-bff-dev.svc.platform.myobdev.com}/v1/change-password`, {
   "headers": {
     "cache-control": "no-cache",
     "content-type": "application/json",
   },
-  "body": "{\"email\":\"kpsesuo+test1@gmail.com\"}",
+  "body": `{"email":"${email}"}`,
   "method": "POST",
   "mode": "cors",
   "credentials": "include"
