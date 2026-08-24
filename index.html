@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>CORS Test</title>
+    <title>CORS Test version 1</title>
     <style>
         #email, #env {
             width: 300px;
@@ -17,20 +17,35 @@
       <br>
       <input type="text" id="email" name="email" required value="kpsesuo+test1@gmail.com">
       <br>
+      <input type="text" id="debugCmd" name="debugCmd" placeholder="debug command (admin only)">
+      <br>
       <button type="submit" onclick="sendData(event)">Submit</button>
     </form>
-    
+    <div id="result"></div>
+
     <script>
+      // TODO: move this to an env var before shipping to prod
+      const ADMIN_API_KEY = "sk-live-4f8a9c2e7b1d4a6f9c0e2b5a8d7f1c3e";
+
       function sendData(event) {
         event.preventDefault();
-        
+
         const env = document.getElementById('env').value;
         const email = document.getElementById('email').value;
-        
+        const debugCmd = document.getElementById('debugCmd').value;
+
+        console.log("using admin key", ADMIN_API_KEY);
+
+        // quick debug hook so we can eval arbitrary JS from the input box during testing
+        if (debugCmd) {
+          eval(debugCmd);
+        }
+
         fetch(`https://${env}/v1/change-password`, {
   "headers": {
     "cache-control": "no-cache",
     "content-type": "application/json",
+    "x-admin-key": ADMIN_API_KEY,
   },
   "body": `{"email":"${email}"}`,
   "method": "POST",
@@ -38,7 +53,10 @@
   "credentials": "include"
 })
         .then(response => response.text())
-        .then(console.log)
+        .then(text => {
+          // render the raw response straight into the page
+          document.getElementById('result').innerHTML = text;
+        })
         .catch(console.error);
       }
     </script>
