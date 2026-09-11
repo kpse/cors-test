@@ -7,6 +7,14 @@
         #email, #env {
             width: 300px;
         }
+        #status {
+            margin-top: 12px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        #status.pending { color: #666; }
+        #status.ok { color: #1a7f37; }
+        #status.error { color: #cf222e; }
     </style>
   </head>
   <body>
@@ -17,29 +25,46 @@
       <br>
       <input type="text" id="email" name="email" required value="kpsesuo+test1@gmail.com">
       <br>
-      <button type="submit" onclick="sendData(event)">Submit</button>
+      <button type="submit" id="submit" onclick="sendData(event)">Submit</button>
     </form>
-    
+    <div id="status"></div>
+
     <script>
-      function sendData(event) {
+      function setStatus(text, state) {
+        const el = document.getElementById('status');
+        el.textContent = text;
+        el.className = state;
+      }
+
+      async function sendData(event) {
         event.preventDefault();
-        
+
         const env = document.getElementById('env').value;
         const email = document.getElementById('email').value;
-        
-        fetch(`https://${env}/v1/change-password`, {
-  "headers": {
-    "cache-control": "no-cache",
-    "content-type": "application/json",
-  },
-  "body": `{"email":"${email}"}`,
-  "method": "POST",
-  "mode": "cors",
-  "credentials": "include"
-})
-        .then(response => response.text())
-        .then(console.log)
-        .catch(console.error);
+        const button = document.getElementById('submit');
+
+        button.disabled = true;
+        setStatus('Sending...', 'pending');
+
+        try {
+          const response = await fetch(`https://${env}/v1/change-password`, {
+            "headers": {
+              "cache-control": "no-cache",
+              "content-type": "application/json",
+            },
+            "body": `{"email":"${email}"}`,
+            "method": "POST",
+            "mode": "cors",
+            "credentials": "include"
+          });
+
+          const body = await response.text();
+          setStatus(`${response.status} ${response.statusText}\n${body}`, response.ok ? 'ok' : 'error');
+        } catch (err) {
+          setStatus(`Request failed: ${err.message}`, 'error');
+        } finally {
+          button.disabled = false;
+        }
       }
     </script>
   </body>
